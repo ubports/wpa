@@ -33,6 +33,22 @@ wpa (2.4-0ubuntu7~overlay1) vivid; urgency=medium
 
  -- Simon Fels <simon.fels@canonical.com>  Mon, 04 Apr 2016 11:35:55 +0200
 
+wpa (2.4-0ubuntu6.2) xenial-security; urgency=medium
+
+  * SECURITY UPDATE: Multiple issues in WPA protocol
+    - debian/patches/2017-1/*.patch: Add patches from Debian stretch
+    - CVE-2017-13077, CVE-2017-13078, CVE-2017-13079, CVE-2017-13080,
+      CVE-2017-13081, CVE-2017-13082, CVE-2017-13086, CVE-2017-13087,
+      CVE-2017-13088
+  * SECURITY UPDATE: Denial of service issues
+    - debian/patches/2016-1/*.patch: Add patches from Debian stretch
+    - CVE-2016-4476
+    - CVE-2016-4477
+  * This package does _not_ contain the changes from 2.4-0ubuntu6.1 in
+    xenial-proposed.
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Mon, 16 Oct 2017 07:58:48 -0400
+
 wpa (2.4-0ubuntu6) xenial; urgency=medium
 
   * debian/patches/wpasupplicant_band_selection_aa517ae2.patch: add the last 
