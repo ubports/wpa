@@ -21,3 +21,14 @@ CVE-2015-8041.patch
 wpasupplicant_band_selection_aa517ae2.patch
 allow-private-driver-commands.patch
 enable-widi-for-mtk.patch
+2017-1/0001-hostapd-Avoid-key-reinstallation-in-FT-handshake.patch
+2017-1/0002-Prevent-reinstallation-of-an-already-in-use-group-ke.patch
+2017-1/0003-Extend-protection-of-GTK-IGTK-reinstallation-of-WNM-.patch
+2017-1/0004-Fix-TK-configuration-to-the-driver-in-EAPOL-Key-3-4-.patch
+2017-1/0005-Prevent-installation-of-an-all-zero-TK.patch
+2017-1/0006-Fix-PTK-rekeying-to-generate-a-new-ANonce.patch
+2017-1/0007-TDLS-Reject-TPK-TK-reconfiguration.patch
+2017-1/0009-WNM-Ignore-WNM-Sleep-Mode-Response-if-WNM-Sleep-Mode.patch
+2017-1/0010-WNM-Ignore-WNM-Sleep-Mode-Response-without-pending-r.patch
+2017-1/0011-FT-Do-not-allow-multiple-Reassociation-Response-fram.patch
+2017-1/0012-TDLS-Ignore-incoming-TDLS-Setup-Response-retries.patch
