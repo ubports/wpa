@@ -1,4 +1,4 @@
-wpa (2.4-0ubports8) vivid; urgency=medium
+wpa (2.4-0ubports8) xenial; urgency=medium
 
   * Fix multiple issues in WPA protocol (CVE-2017-13077, CVE-2017-13078,
     CVE-2017-13079, CVE-2017-13080, CVE-2017-13081, CVE-2017-13082,
