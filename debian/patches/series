@@ -38,3 +38,4 @@ enable-widi-for-mtk.patch
 2017-1/0010-WNM-Ignore-WNM-Sleep-Mode-Response-without-pending-r.patch
 2017-1/0011-FT-Do-not-allow-multiple-Reassociation-Response-fram.patch
 2017-1/0012-TDLS-Ignore-incoming-TDLS-Setup-Response-retries.patch
+CVE-2018-14526.patch
