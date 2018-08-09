@@ -33,6 +33,14 @@ wpa (2.4-0ubuntu7~overlay1) vivid; urgency=medium
 
  -- Simon Fels <simon.fels@canonical.com>  Mon, 04 Apr 2016 11:35:55 +0200
 
+wpa (2.4-0ubuntu6.3) xenial-security; urgency=medium
+
+  * SECURITY UPDATE: Expose sensitive information
+    - debian/patches/CVE-2018-14526.patch: fix in src/rsn_supp/wpa.c.
+    - CVE-2018-14526
+
+ -- Leonidas S. Barbosa <leo.barbosa@canonical.com>  Thu, 09 Aug 2018 12:51:53 -0300
+
 wpa (2.4-0ubuntu6.2) xenial-security; urgency=medium
 
   * SECURITY UPDATE: Multiple issues in WPA protocol
