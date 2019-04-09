@@ -1,0 +1,123 @@
+From 23ff5d73dfbc8267c239e0d210d19249fbd0f2ce Mon Sep 17 00:00:00 2001
+From: Sean Parkinson <sean@wolfssl.com>
+Date: Mon, 16 Oct 2017 15:45:09 +1000
+Subject: Enhance crypto abstract API
+
+Add more crypto_*() wrappers to enable use of other crypto libraries
+than OpenSSL.
+
+Signed-off-by: Sean Parkinson <sean@wolfssl.com>
+---
+ src/crypto/crypto.h | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 57 insertions(+)
+
+Index: wpa-2.4/src/crypto/crypto.h
+===================================================================
+--- wpa-2.4.orig/src/crypto/crypto.h	2019-04-09 07:14:29.587121052 -0400
++++ wpa-2.4/src/crypto/crypto.h	2019-04-09 07:14:29.587121052 -0400
+@@ -391,6 +391,13 @@ int __must_check crypto_public_key_decry
+ 	struct crypto_public_key *key, const u8 *crypt, size_t crypt_len,
+ 	u8 *plain, size_t *plain_len);
+ 
++int crypto_dh_init(u8 generator, const u8 *prime, size_t prime_len, u8 *privkey,
++		   u8 *pubkey);
++int crypto_dh_derive_secret(u8 generator, const u8 *prime, size_t prime_len,
++			    const u8 *privkey, size_t privkey_len,
++			    const u8 *pubkey, size_t pubkey_len,
++			    u8 *secret, size_t *len);
++
+ /**
+  * crypto_global_init - Initialize crypto wrapper
+  *
+@@ -503,6 +510,14 @@ int crypto_bignum_to_bin(const struct cr
+ 			 u8 *buf, size_t buflen, size_t padlen);
+ 
+ /**
++ * crypto_bignum_rand - Create a random number in range of modulus
++ * @r: Bignum; set to a random value
++ * @m: Bignum; modulus
++ * Returns: 0 on success, -1 on failure
++ */
++int crypto_bignum_rand(struct crypto_bignum *r, const struct crypto_bignum *m);
++
++/**
+  * crypto_bignum_add - c = a + b
+  * @a: Bignum
+  * @b: Bignum
+@@ -584,6 +599,16 @@ int crypto_bignum_mulmod(const struct cr
+ 			 struct crypto_bignum *d);
+ 
+ /**
++ * crypto_bignum_rshift - r = a >> n
++ * @a: Bignum
++ * @n: Number of bits
++ * @r: Bignum; used to store the result of a >> n
++ * Returns: 0 on success, -1 on failure
++ */
++int crypto_bignum_rshift(const struct crypto_bignum *a, int n,
++			 struct crypto_bignum *r);
++
++/**
+  * crypto_bignum_cmp - Compare two bignums
+  * @a: Bignum
+  * @b: Bignum
+@@ -614,6 +639,13 @@ int crypto_bignum_is_zero(const struct c
+ int crypto_bignum_is_one(const struct crypto_bignum *a);
+ 
+ /**
++ * crypto_bignum_is_odd - Is the given bignum odd
++ * @a: Bignum
++ * Returns: 1 if @a is odd or 0 if not
++ */
++int crypto_bignum_is_odd(const struct crypto_bignum *a);
++
++/**
+  * crypto_bignum_legendre - Compute the Legendre symbol (a/p)
+  * @a: Bignum
+  * @p: Bignum
+@@ -645,6 +677,14 @@ struct crypto_ec * crypto_ec_init(int gr
+ void crypto_ec_deinit(struct crypto_ec *e);
+ 
+ /**
++ * crypto_ec_cofactor - Set the cofactor into the big number
++ * @e: EC context from crypto_ec_init()
++ * @cofactor: Cofactor of curve.
++ * Returns: 0 on success, -1 on failure
++ */
++int crypto_ec_cofactor(struct crypto_ec *e, struct crypto_bignum *cofactor);
++
++/**
+  * crypto_ec_prime_len - Get length of the prime in octets
+  * @e: EC context from crypto_ec_init()
+  * Returns: Length of the prime defining the group
+@@ -659,6 +699,13 @@ size_t crypto_ec_prime_len(struct crypto
+ size_t crypto_ec_prime_len_bits(struct crypto_ec *e);
+ 
+ /**
++ * crypto_ec_order_len - Get length of the order in octets
++ * @e: EC context from crypto_ec_init()
++ * Returns: Length of the order defining the group
++ */
++size_t crypto_ec_order_len(struct crypto_ec *e);
++
++/**
+  * crypto_ec_get_prime - Get prime defining an EC group
+  * @e: EC context from crypto_ec_init()
+  * Returns: Prime (bignum) defining the group
+@@ -695,6 +742,16 @@ struct crypto_ec_point * crypto_ec_point
+ void crypto_ec_point_deinit(struct crypto_ec_point *p, int clear);
+ 
+ /**
++ * crypto_ec_point_x - Copies the x-ordinate point into big number
++ * @e: EC context from crypto_ec_init()
++ * @p: EC point data
++ * @x: Big number to set to the copy of x-ordinate
++ * Returns: 0 on success, -1 on failure
++ */
++int crypto_ec_point_x(struct crypto_ec *e, const struct crypto_ec_point *p,
++		      struct crypto_bignum *x);
++
++/**
+  * crypto_ec_point_to_bin - Write EC point value as binary data
+  * @e: EC context from crypto_ec_init()
+  * @p: EC point data from crypto_ec_point_init()

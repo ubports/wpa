@@ -1,0 +1,26 @@
+From fda7660106a8b700a29b3e653dd25e96572b3aa7 Mon Sep 17 00:00:00 2001
+From: Jouni Malinen <jouni@codeaurora.org>
+Date: Thu, 7 Mar 2019 00:27:12 +0200
+Subject: EAP-pwd: Fix a memory leak in hunting-and-pecking loop
+
+tmp2 (y^2) was derived once in each iteration of the loop and only freed
+after all the loop iterations. Fix this by freeing the temporary value
+during each iteration.
+
+Signed-off-by: Jouni Malinen <jouni@codeaurora.org>
+---
+ src/eap_common/eap_pwd_common.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+Index: wpa-2.4/src/eap_common/eap_pwd_common.c
+===================================================================
+--- wpa-2.4.orig/src/eap_common/eap_pwd_common.c	2019-04-09 07:28:33.633995558 -0400
++++ wpa-2.4/src/eap_common/eap_pwd_common.c	2019-04-09 07:28:33.633995558 -0400
+@@ -237,6 +237,7 @@ int compute_password_element(EAP_PWD_gro
+ 		 *
+ 		 *      y^2 = x^3 + ax + b
+ 		 */
++		crypto_bignum_deinit(tmp2, 1);
+ 		tmp2 = crypto_ec_point_compute_y_sqr(grp->group, x_candidate);
+ 		if (!tmp2)
+ 			goto fail;
