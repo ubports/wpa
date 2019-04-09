@@ -1,0 +1,51 @@
+From 4e7e68890a1a1eac34b70adf0c0c034b0e27810b Mon Sep 17 00:00:00 2001
+From: Jouni Malinen <j@w1.fi>
+Date: Tue, 23 Jun 2015 22:29:23 +0300
+Subject: Add crypto_ec_point_cmp()
+
+This is needed to allow SAE to check whether ECC elements are identical.
+
+Signed-off-by: Jouni Malinen <j@w1.fi>
+---
+ src/crypto/crypto.h         | 11 +++++++++++
+ src/crypto/crypto_openssl.c |  9 +++++++++
+ 2 files changed, 20 insertions(+)
+
+Index: wpa-2.4/src/crypto/crypto.h
+===================================================================
+--- wpa-2.4.orig/src/crypto/crypto.h	2019-04-09 07:44:08.003410107 -0400
++++ wpa-2.4/src/crypto/crypto.h	2019-04-09 07:44:07.991410092 -0400
+@@ -776,4 +776,15 @@ int crypto_ec_point_is_at_infinity(struc
+ int crypto_ec_point_is_on_curve(struct crypto_ec *e,
+ 				const struct crypto_ec_point *p);
+ 
++/**
++ * crypto_ec_point_cmp - Compare two EC points
++ * @e: EC context from crypto_ec_init()
++ * @a: EC point
++ * @b: EC point
++ * Returns: 0 on equal, non-zero otherwise
++ */
++int crypto_ec_point_cmp(const struct crypto_ec *e,
++			const struct crypto_ec_point *a,
++			const struct crypto_ec_point *b);
++
+ #endif /* CRYPTO_H */
+Index: wpa-2.4/src/crypto/crypto_openssl.c
+===================================================================
+--- wpa-2.4.orig/src/crypto/crypto_openssl.c	2019-04-09 07:44:08.003410107 -0400
++++ wpa-2.4/src/crypto/crypto_openssl.c	2019-04-09 07:44:07.991410092 -0400
+@@ -1276,4 +1276,13 @@ int crypto_ec_point_is_on_curve(struct c
+ 	return EC_POINT_is_on_curve(e->group, (const EC_POINT *) p, e->bnctx);
+ }
+ 
++
++int crypto_ec_point_cmp(const struct crypto_ec *e,
++			const struct crypto_ec_point *a,
++			const struct crypto_ec_point *b)
++{
++	return EC_POINT_cmp(e->group, (const EC_POINT *) a,
++			    (const EC_POINT *) b, e->bnctx);
++}
++
+ #endif /* CONFIG_ECC */

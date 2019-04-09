@@ -1,0 +1,100 @@
+From eac084cb385a3e302c6b57ce6cfba57cc1e65bf2 Mon Sep 17 00:00:00 2001
+From: Jouni Malinen <j@w1.fi>
+Date: Sat, 23 Dec 2017 17:51:14 +0200
+Subject: OpenSSL: Implement new crypto API functions
+
+Signed-off-by: Jouni Malinen <j@w1.fi>
+---
+ src/crypto/crypto_openssl.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
+
+Index: wpa-2.4/src/crypto/crypto_openssl.c
+===================================================================
+--- wpa-2.4.orig/src/crypto/crypto_openssl.c	2019-04-09 07:14:32.659138858 -0400
++++ wpa-2.4/src/crypto/crypto_openssl.c	2019-04-09 07:14:32.655138836 -0400
+@@ -920,6 +920,12 @@ int crypto_bignum_to_bin(const struct cr
+ }
+ 
+ 
++int crypto_bignum_rand(struct crypto_bignum *r, const struct crypto_bignum *m)
++{
++	return BN_rand_range((BIGNUM *) r, (const BIGNUM *) m) == 1 ? 0 : -1;
++}
++
++
+ int crypto_bignum_add(const struct crypto_bignum *a,
+ 		      const struct crypto_bignum *b,
+ 		      struct crypto_bignum *c)
+@@ -1032,6 +1038,15 @@ int crypto_bignum_mulmod(const struct cr
+ }
+ 
+ 
++int crypto_bignum_rshift(const struct crypto_bignum *a, int n,
++			 struct crypto_bignum *r)
++{
++	/* Note: BN_rshift() does not modify the first argument even though it
++	 * has not been marked const. */
++	return BN_rshift((BIGNUM *) a, (BIGNUM *) r, n) == 1 ? 0 : -1;
++}
++
++
+ int crypto_bignum_cmp(const struct crypto_bignum *a,
+ 		      const struct crypto_bignum *b)
+ {
+@@ -1057,6 +1072,12 @@ int crypto_bignum_is_one(const struct cr
+ }
+ 
+ 
++int crypto_bignum_is_odd(const struct crypto_bignum *a)
++{
++	return BN_is_odd((const BIGNUM *) a);
++}
++
++
+ int crypto_bignum_legendre(const struct crypto_bignum *a,
+ 			   const struct crypto_bignum *p)
+ {
+@@ -1166,6 +1187,13 @@ void crypto_ec_deinit(struct crypto_ec *
+ }
+ 
+ 
++int crypto_ec_cofactor(struct crypto_ec *e, struct crypto_bignum *cofactor)
++{
++	return EC_GROUP_get_cofactor(e->group, (BIGNUM *) cofactor,
++				     e->bnctx) == 0 ? -1 : 0;
++}
++
++
+ struct crypto_ec_point * crypto_ec_point_init(struct crypto_ec *e)
+ {
+ 	if (e == NULL)
+@@ -1186,6 +1214,12 @@ size_t crypto_ec_prime_len_bits(struct c
+ }
+ 
+ 
++size_t crypto_ec_order_len(struct crypto_ec *e)
++{
++	return BN_num_bytes(e->order);
++}
++
++
+ const struct crypto_bignum * crypto_ec_get_prime(struct crypto_ec *e)
+ {
+ 	return (const struct crypto_bignum *) e->prime;
+@@ -1207,6 +1241,16 @@ void crypto_ec_point_deinit(struct crypt
+ }
+ 
+ 
++int crypto_ec_point_x(struct crypto_ec *e, const struct crypto_ec_point *p,
++		      struct crypto_bignum *x)
++{
++	return EC_POINT_get_affine_coordinates_GFp(e->group,
++						   (const EC_POINT *) p,
++						   (BIGNUM *) x, NULL,
++						   e->bnctx) == 1 ? 0 : -1;
++}
++
++
+ int crypto_ec_point_to_bin(struct crypto_ec *e,
+ 			   const struct crypto_ec_point *point, u8 *x, u8 *y)
+ {

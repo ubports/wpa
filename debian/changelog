@@ -33,6 +33,21 @@ wpa (2.4-0ubuntu7~overlay1) vivid; urgency=medium
 
  -- Simon Fels <simon.fels@canonical.com>  Mon, 04 Apr 2016 11:35:55 +0200
 
+wpa (2.4-0ubuntu6.4) xenial-security; urgency=medium
+
+  * SECURITY UPDATE: Multiple security issues
+    - debian/patches/VU-871675/*.patch: backported upstream patches.
+    - CVE-2019-9495
+    - CVE-2019-9497
+    - CVE-2019-9498
+    - CVE-2019-9499
+  * SECURITY UPDATE: insecure os_random() fallback
+    - debian/patches/CVE-2016-10743.patch: Use only os_get_random() for PIN
+      generation.
+    - CVE-2016-10743
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Tue, 09 Apr 2019 07:29:43 -0400
+
 wpa (2.4-0ubuntu6.3) xenial-security; urgency=medium
 
   * SECURITY UPDATE: Expose sensitive information
