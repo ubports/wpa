@@ -56,3 +56,5 @@ VU-871675/0012-EAP-pwd-server-Detect-reflection-attacks.patch
 VU-871675/0013-EAP-pwd-client-Verify-received-scalar-and-element.patch
 VU-871675/0014-EAP-pwd-Check-element-x-y-coordinates-explicitly.patch
 CVE-2016-10743.patch
+CVE-2019-11555-1.patch
+CVE-2019-11555-2.patch
