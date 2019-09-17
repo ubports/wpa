@@ -33,6 +33,17 @@ wpa (2.4-0ubuntu7~overlay1) vivid; urgency=medium
 
  -- Simon Fels <simon.fels@canonical.com>  Mon, 04 Apr 2016 11:35:55 +0200
 
+wpa (2.4-0ubuntu6.6) xenial-security; urgency=medium
+
+   * SECURITY UPDATE: Incorrect indication of disconnection in certain
+     situations
+     - debian/patches/CVE-2019-16275.patch: silently ignore management
+       frame from unexpected source address in src/ap/drv_callbacks.c,
+       src/ap/ieee882_11.c.
+     - CVE-2019-16275
+
+ -- Leonidas S. Barbosa <leo.barbosa@canonical.com>  Tue, 17 Sep 2019 08:41:25 -0300
+
 wpa (2.4-0ubuntu6.5) xenial-security; urgency=medium
 
   * SECURITY UPDATE: EAP-pwd DoS via unexpected fragment
