@@ -58,3 +58,4 @@ VU-871675/0014-EAP-pwd-Check-element-x-y-coordinates-explicitly.patch
 CVE-2016-10743.patch
 CVE-2019-11555-1.patch
 CVE-2019-11555-2.patch
+CVE-2019-16275.patch
