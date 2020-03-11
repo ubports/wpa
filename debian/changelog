@@ -1,3 +1,10 @@
+wpa (2.4-0ubports9) xenial; urgency=medium
+
+  * Import security update from xenial upto 2.4-0ubuntu6.6
+  * 2017-1/0008-*.patch: use the one in ubuntu6.2 as it has the fuzz removed
+
+ -- Ratchanan Srirattanamet <ratchanan@ubports.com>  Wed, 11 Mar 2020 16:10:11 +0700
+
 wpa (2.4-0ubports8) xenial; urgency=medium
 
   * Fix multiple issues in WPA protocol (CVE-2017-13077, CVE-2017-13078,
