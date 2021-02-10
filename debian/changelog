@@ -45,6 +45,23 @@ wpa (2.4-0ubuntu7~overlay1) vivid; urgency=medium
 
  -- Simon Fels <simon.fels@canonical.com>  Mon, 04 Apr 2016 11:35:55 +0200
 
+wpa (2.4-0ubuntu6.7) xenial-security; urgency=medium
+
+  * SECURITY UPDATE: P2P discovery heap overflow
+    - debian/patches/CVE-2021-0326.patch: P2P: Fix copying of secondary
+      device types for P2P group client
+    - CVE-2021-0326
+  * SECURITY UPDATE: UPnP SUBSCRIBE misbehavior in WPS AP
+    - debian/patches/CVE-2020-12695-1.patch: WPS UPnP: Do not allow
+      event subscriptions with URLs to other networks
+    - debian/patches/CVE-2020-12695-2.patch: WPS UPnP: Fix event message
+      generation using a long URL path
+    - debian/patches/CVE-2020-12695-3.patch: WPS UPnP: Handle HTTP
+      initiation failures for events more properly
+    - CVE-2020-12695
+
+ -- Steve Beattie <sbeattie@ubuntu.com>  Tue, 09 Feb 2021 22:33:32 -0800
+
 wpa (2.4-0ubuntu6.6) xenial-security; urgency=medium
 
    * SECURITY UPDATE: Incorrect indication of disconnection in certain
