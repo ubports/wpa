@@ -45,6 +45,18 @@ wpa (2.4-0ubuntu7~overlay1) vivid; urgency=medium
 
  -- Simon Fels <simon.fels@canonical.com>  Mon, 04 Apr 2016 11:35:55 +0200
 
+wpa (2.4-0ubuntu6.8) xenial-security; urgency=medium
+
+  * SECURITY UPDATE: DoS and possible code execution via P2P provision
+    discovery requests
+    - debian/patches/CVE-2021-27803-pre1.patch: cleanup handling of unknown
+      peer in PD Request processing in src/p2p/p2p_pd.c.
+    - debian/patches/CVE-2021-27803.patch: fix a corner case in peer
+      addition based on PD Request in src/p2p/p2p_pd.c.
+    - CVE-2021-27803
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Mon, 01 Mar 2021 09:36:31 -0500
+
 wpa (2.4-0ubuntu6.7) xenial-security; urgency=medium
 
   * SECURITY UPDATE: P2P discovery heap overflow
