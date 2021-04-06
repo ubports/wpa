@@ -1,7 +1,9 @@
-wpa (2.4-0ubports10) UNRELEASED; urgency=medium
+wpa (2.4-0ubports10) xenial; urgency=medium
 
+  * Import security update from xenial upto 2.4-0ubuntu6.8
+  * Update jenkinsfile to use the shared library
 
- -- Ratchanan Srirattanamet <peat@peat-lnvle-ubuntu>  Wed, 17 Mar 2021 00:48:35 +0700
+ -- Ratchanan Srirattanamet <ratchanan@ubports.com>  Tue, 06 Apr 2021 19:14:32 +0700
 
 wpa (2.4-0ubports9) xenial; urgency=medium
 
