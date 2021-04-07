@@ -1,3 +1,10 @@
+wpa (2.4-0ubports10) xenial; urgency=medium
+
+  * Import security update from xenial upto 2.4-0ubuntu6.8
+  * Update jenkinsfile to use the shared library
+
+ -- Ratchanan Srirattanamet <ratchanan@ubports.com>  Tue, 06 Apr 2021 19:14:32 +0700
+
 wpa (2.4-0ubports9) xenial; urgency=medium
 
   * Import security update from xenial upto 2.4-0ubuntu6.6
@@ -39,6 +46,35 @@ wpa (2.4-0ubuntu7~overlay1) vivid; urgency=medium
       retrieve all properties. (LP: #1528173)
 
  -- Simon Fels <simon.fels@canonical.com>  Mon, 04 Apr 2016 11:35:55 +0200
+
+wpa (2.4-0ubuntu6.8) xenial-security; urgency=medium
+
+  * SECURITY UPDATE: DoS and possible code execution via P2P provision
+    discovery requests
+    - debian/patches/CVE-2021-27803-pre1.patch: cleanup handling of unknown
+      peer in PD Request processing in src/p2p/p2p_pd.c.
+    - debian/patches/CVE-2021-27803.patch: fix a corner case in peer
+      addition based on PD Request in src/p2p/p2p_pd.c.
+    - CVE-2021-27803
+
+ -- Marc Deslauriers <marc.deslauriers@ubuntu.com>  Mon, 01 Mar 2021 09:36:31 -0500
+
+wpa (2.4-0ubuntu6.7) xenial-security; urgency=medium
+
+  * SECURITY UPDATE: P2P discovery heap overflow
+    - debian/patches/CVE-2021-0326.patch: P2P: Fix copying of secondary
+      device types for P2P group client
+    - CVE-2021-0326
+  * SECURITY UPDATE: UPnP SUBSCRIBE misbehavior in WPS AP
+    - debian/patches/CVE-2020-12695-1.patch: WPS UPnP: Do not allow
+      event subscriptions with URLs to other networks
+    - debian/patches/CVE-2020-12695-2.patch: WPS UPnP: Fix event message
+      generation using a long URL path
+    - debian/patches/CVE-2020-12695-3.patch: WPS UPnP: Handle HTTP
+      initiation failures for events more properly
+    - CVE-2020-12695
+
+ -- Steve Beattie <sbeattie@ubuntu.com>  Tue, 09 Feb 2021 22:33:32 -0800
 
 wpa (2.4-0ubuntu6.6) xenial-security; urgency=medium
 
