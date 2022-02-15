@@ -13,10 +13,10 @@ Subject: [PATCH] Allow us to issue private driver commands by using libwifi
  wpa_supplicant/driver_i.h               |  4 +-
  7 files changed, 143 insertions(+), 15 deletions(-)
 
-Index: wpa-2.4/src/drivers/driver.h
+Index: wpa/src/drivers/driver.h
 ===================================================================
---- wpa-2.4.orig/src/drivers/driver.h
-+++ wpa-2.4/src/drivers/driver.h
+--- wpa.orig/src/drivers/driver.h
++++ wpa/src/drivers/driver.h
 @@ -2846,7 +2846,7 @@ struct wpa_driver_ops {
  	 */
  	int (*set_authmode)(void *priv, int authmode);
@@ -35,10 +35,10 @@ Index: wpa-2.4/src/drivers/driver.h
  
  	/**
  	 * vendor_cmd - Execute vendor specific command
-Index: wpa-2.4/src/drivers/driver_nl80211.c
+Index: wpa/src/drivers/driver_nl80211.c
 ===================================================================
---- wpa-2.4.orig/src/drivers/driver_nl80211.c
-+++ wpa-2.4/src/drivers/driver_nl80211.c
+--- wpa.orig/src/drivers/driver_nl80211.c
++++ wpa/src/drivers/driver_nl80211.c
 @@ -22,6 +22,7 @@
  #include <linux/rtnetlink.h>
  #include <netpacket/packet.h>
@@ -177,10 +177,10 @@ Index: wpa-2.4/src/drivers/driver_nl80211.c
  	.vendor_cmd = nl80211_vendor_cmd,
  	.set_qos_map = nl80211_set_qos_map,
  	.set_wowlan = nl80211_set_wowlan,
-Index: wpa-2.4/src/drivers/driver_nl80211.h
+Index: wpa/src/drivers/driver_nl80211.h
 ===================================================================
---- wpa-2.4.orig/src/drivers/driver_nl80211.h
-+++ wpa-2.4/src/drivers/driver_nl80211.h
+--- wpa.orig/src/drivers/driver_nl80211.h
++++ wpa/src/drivers/driver_nl80211.h
 @@ -236,8 +236,6 @@ int android_genl_ctrl_resolve(struct nl_
  int android_pno_start(struct i802_bss *bss,
  		      struct wpa_driver_scan_params *params);
@@ -190,10 +190,10 @@ Index: wpa-2.4/src/drivers/driver_nl80211.h
  
  #ifdef ANDROID_P2P
  int wpa_driver_set_p2p_noa(void *priv, u8 count, int start, int duration);
-Index: wpa-2.4/wpa_supplicant/ctrl_iface.c
+Index: wpa/wpa_supplicant/ctrl_iface.c
 ===================================================================
---- wpa-2.4.orig/wpa_supplicant/ctrl_iface.c
-+++ wpa-2.4/wpa_supplicant/ctrl_iface.c
+--- wpa.orig/wpa_supplicant/ctrl_iface.c
++++ wpa/wpa_supplicant/ctrl_iface.c
 @@ -6497,8 +6497,7 @@ static int wpa_supplicant_pktcnt_poll(st
  	return ret;
  }
@@ -228,10 +228,10 @@ Index: wpa-2.4/wpa_supplicant/ctrl_iface.c
  	} else if (os_strncmp(buf, "VENDOR ", 7) == 0) {
  		reply_len = wpa_supplicant_vendor_cmd(wpa_s, buf + 7, reply,
  						      reply_size);
-Index: wpa-2.4/wpa_supplicant/dbus/dbus_new.c
+Index: wpa/wpa_supplicant/dbus/dbus_new.c
 ===================================================================
---- wpa-2.4.orig/wpa_supplicant/dbus/dbus_new.c
-+++ wpa-2.4/wpa_supplicant/dbus/dbus_new.c
+--- wpa.orig/wpa_supplicant/dbus/dbus_new.c
++++ wpa/wpa_supplicant/dbus/dbus_new.c
 @@ -2772,6 +2772,16 @@ static const struct wpa_dbus_method_desc
  		  END_ARGS
  	  }
@@ -249,11 +249,11 @@ Index: wpa-2.4/wpa_supplicant/dbus/dbus_new.c
  #ifdef CONFIG_WPS
  	{ "Start", WPAS_DBUS_NEW_IFACE_WPS,
  	  (WPADBusMethodHandler) wpas_dbus_handler_wps_start,
-Index: wpa-2.4/wpa_supplicant/dbus/dbus_new_handlers.c
+Index: wpa/wpa_supplicant/dbus/dbus_new_handlers.c
 ===================================================================
---- wpa-2.4.orig/wpa_supplicant/dbus/dbus_new_handlers.c
-+++ wpa-2.4/wpa_supplicant/dbus/dbus_new_handlers.c
-@@ -651,9 +651,7 @@ oom:
+--- wpa.orig/wpa_supplicant/dbus/dbus_new_handlers.c
++++ wpa/wpa_supplicant/dbus/dbus_new_handlers.c
+@@ -647,9 +647,7 @@ oom:
  DBusMessage * wpas_dbus_handler_set_interface_firmware(DBusMessage *message,
  						       struct wpa_global *global)
  {
@@ -262,8 +262,8 @@ Index: wpa-2.4/wpa_supplicant/dbus/dbus_new_handlers.c
 -	DBusMessageIter iter;
  	void *libwifi;
  	const char *iface, *firmware, *path;
- 	int fw_type, res;
-@@ -2380,6 +2378,42 @@ DBusMessage * wpas_dbus_handler_set_pkcs
+ 	int res = 0;
+@@ -2347,6 +2345,42 @@ DBusMessage * wpas_dbus_handler_set_pkcs
  	return NULL;
  }
  
@@ -306,10 +306,10 @@ Index: wpa-2.4/wpa_supplicant/dbus/dbus_new_handlers.c
  
  /**
   * wpas_dbus_getter_capabilities - Return interface capabilities
-Index: wpa-2.4/wpa_supplicant/driver_i.h
+Index: wpa/wpa_supplicant/driver_i.h
 ===================================================================
---- wpa-2.4.orig/wpa_supplicant/driver_i.h
-+++ wpa-2.4/wpa_supplicant/driver_i.h
+--- wpa.orig/wpa_supplicant/driver_i.h
++++ wpa/wpa_supplicant/driver_i.h
 @@ -558,7 +558,7 @@ static inline int wpa_drv_tdls_oper(stru
  	return wpa_s->driver->tdls_oper(wpa_s->drv_priv, oper, peer);
  }
@@ -328,13 +328,13 @@ Index: wpa-2.4/wpa_supplicant/driver_i.h
  
  static inline void wpa_drv_set_rekey_info(struct wpa_supplicant *wpa_s,
  					  const u8 *kek, size_t kek_len,
-Index: wpa-2.4/wpa_supplicant/dbus/dbus_new_handlers.h
+Index: wpa/wpa_supplicant/dbus/dbus_new_handlers.h
 ===================================================================
---- wpa-2.4.orig/wpa_supplicant/dbus/dbus_new_handlers.h
-+++ wpa-2.4/wpa_supplicant/dbus/dbus_new_handlers.h
-@@ -366,4 +366,9 @@ DBusMessage * wpas_dbus_handler_send_dri
- 	struct wpa_supplicant *wpa_s);
- #endif
+--- wpa.orig/wpa_supplicant/dbus/dbus_new_handlers.h
++++ wpa/wpa_supplicant/dbus/dbus_new_handlers.h
+@@ -365,4 +365,9 @@ DBusMessage * wpas_dbus_handler_subscrib
+ DBusMessage * wpas_dbus_handler_unsubscribe_preq(
+ 	DBusMessage *message, struct wpa_supplicant *wpa_s);
  
 +#ifdef CONFIG_ANDROID_HAL
 +DBusMessage * wpas_dbus_handler_send_driver_command(DBusMessage *message,
