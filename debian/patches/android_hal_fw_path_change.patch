@@ -71,8 +71,8 @@ Index: wpa/wpa_supplicant/dbus/dbus_new_handlers.c
 +		return wpas_dbus_error_invalid_args(message, NULL);
 +
 +	if (os_strcasecmp(firmware, "sta") != 0
-+		&& os_strcasecmp(firmware, "ap") != 0)
-+		&& os_strcasecmp(firmware, "p2p") != 0)) {
++		&& os_strcasecmp(firmware, "ap") != 0
++		&& os_strcasecmp(firmware, "p2p") != 0) {
 +		reply = wpas_dbus_error_invalid_args(
 +			message, "wpa_supplicant couldn't recognize the "
 +			"firmware mode string. Valid options are: "
