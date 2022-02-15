@@ -38,18 +38,7 @@ Index: wpa/wpa_supplicant/dbus/dbus_new_handlers.c
 ===================================================================
 --- wpa.orig/wpa_supplicant/dbus/dbus_new_handlers.c
 +++ wpa/wpa_supplicant/dbus/dbus_new_handlers.c
-@@ -32,6 +32,10 @@
- #include "dbus_dict_helpers.h"
- #include "dbus_common_i.h"
- #include "drivers/driver.h"
-+#ifdef CONFIG_ANDROID_HAL
-+#include <dlfcn.h>
-+#include <android/hardware_legacy/wifi.h>
-+#endif
- 
- static const char * const debug_strings[] = {
- 	"excessive", "msgdump", "debug", "info", "warning", "error", NULL
-@@ -632,6 +636,94 @@ oom:
+@@ -632,6 +632,65 @@ oom:
  	goto out;
  }
  
@@ -72,7 +61,8 @@ Index: wpa/wpa_supplicant/dbus/dbus_new_handlers.c
 +	DBusMessageIter iter;
 +	void *libwifi;
 +	const char *iface, *firmware, *path;
-+	int fw_type, res;
++	int res = 0;
++	FILE *f = NULL;
 +
 +	if (!dbus_message_get_args(message, NULL,
 +	                           DBUS_TYPE_OBJECT_PATH, &iface,
@@ -80,67 +70,37 @@ Index: wpa/wpa_supplicant/dbus/dbus_new_handlers.c
 +			           DBUS_TYPE_INVALID))
 +		return wpas_dbus_error_invalid_args(message, NULL);
 +
-+	libwifi = dlopen("libwifi.so.1", RTLD_LAZY);
-+	if (libwifi) {
-+		int (*check_wifi_hal)();
-+		const char * (*get_fw_path)(int);
-+		int (*change_fw_path)(const char *);
-+
-+		*(void **) (&check_wifi_hal)
-+			= dlsym(libwifi, "wifi_compat_check_availability");
-+		*(void **) (&get_fw_path)
-+			= dlsym(libwifi, "wifi_get_fw_path");
-+		*(void **) (&change_fw_path)
-+			= dlsym(libwifi, "wifi_change_fw_path");
-+
-+		if (!check_wifi_hal || !get_fw_path || !change_fw_path) {
-+			reply = wpas_dbus_error_unknown_error(
-+				message, "Required Android HAL libwifi "
-+				"version not available.");
-+			goto out;
-+		}
-+
-+		if (!(*check_wifi_hal)()) {
-+			reply = wpas_dbus_error_unknown_error(
-+				message, "This function is not supported "
-+				"on this system.");
-+			goto out;
-+		}
-+
-+		if (os_strcasecmp(firmware, "sta") == 0) {
-+			fw_type = WIFI_GET_FW_PATH_STA;
-+		}
-+		else if (os_strcasecmp(firmware, "ap") == 0) {
-+			fw_type = WIFI_GET_FW_PATH_AP;
-+		}
-+		else if (os_strcasecmp(firmware, "p2p") == 0) {
-+			fw_type = WIFI_GET_FW_PATH_P2P;
-+		}
-+		else {
-+			reply = wpas_dbus_error_invalid_args(
-+				message, "wpa_supplicant couldn't recognize the "
-+				"firmware mode string. Valid options are: "
-+			        "AP, STA, P2P");
-+			goto out;
-+		}
-+
-+		path = (*get_fw_path)(fw_type);
-+		res = (*change_fw_path)(path);
-+		if (res < 0) {
-+			reply = wpas_dbus_error_unknown_error(
-+				message, "The wireless device mode change "
-+				"failed.");
-+			goto out;
-+		}
++	if (os_strcasecmp(firmware, "sta") != 0
++		&& os_strcasecmp(firmware, "ap") != 0)
++		&& os_strcasecmp(firmware, "p2p") != 0)) {
++		reply = wpas_dbus_error_invalid_args(
++			message, "wpa_supplicant couldn't recognize the "
++			"firmware mode string. Valid options are: "
++		        "ap, sta, p2p");
++		goto out;
 +	}
 +
++	f = fopen(WIFI_DRIVER_FW_PATH_PARAM, "w");
++	if (!f) {
++		reply = wpas_dbus_error_unknown_error(
++			message, "wpa_supplicant couldn't open the "
++			"firmware path. Please check the permissions";
++		goto out;
++	}
++
++	setvbuf (f, NULL, _IONBF, 0);
++	res = fprintf(f, "%s", firmware);
++	if (res != strlen(firmware) || ferror(f)) {
++		reply = wpas_dbus_error_unknown_error(
++			message, "The wireless device mode change "
++			"failed.");
++	}
++	fclose(f);
++
 +out:
-+	if (libwifi)
-+		dlclose(libwifi);
 +	return reply;
 +}
 +#endif /* CONFIG_ANDROID_HAL */
-+
  
  /**
   * wpas_dbus_handler_remove_interface - Request deregistration of an interface
@@ -148,7 +108,18 @@ Index: wpa/wpa_supplicant/dbus/dbus_new_handlers.h
 ===================================================================
 --- wpa.orig/wpa_supplicant/dbus/dbus_new_handlers.h
 +++ wpa/wpa_supplicant/dbus/dbus_new_handlers.h
-@@ -49,6 +49,9 @@ dbus_bool_t wpas_dbus_simple_array_array
+@@ -10,6 +10,10 @@
+ #ifndef CTRL_IFACE_DBUS_NEW_HANDLERS_H
+ #define CTRL_IFACE_DBUS_NEW_HANDLERS_H
+ 
++#ifdef CONFIG_ANDROID_HAL
++#define WIFI_DRIVER_FW_PATH_PARAM "/sys/module/wlan/parameters/fwpath"
++#endif
++
+ struct network_handler_args {
+ 	struct wpa_supplicant *wpa_s;
+ 	struct wpa_ssid *ssid;
+@@ -49,6 +53,9 @@ dbus_bool_t wpas_dbus_simple_array_array
  DBusMessage * wpas_dbus_handler_create_interface(DBusMessage *message,
  						 struct wpa_global *global);
  
@@ -158,27 +129,16 @@ Index: wpa/wpa_supplicant/dbus/dbus_new_handlers.h
  DBusMessage * wpas_dbus_handler_remove_interface(DBusMessage *message,
  						 struct wpa_global *global);
  
-@@ -358,4 +361,9 @@ DBusMessage * wpas_dbus_handler_subscrib
- DBusMessage * wpas_dbus_handler_unsubscribe_preq(
- 	DBusMessage *message, struct wpa_supplicant *wpa_s);
- 
-+#ifdef CONFIG_ANDROID_HAL
-+DBusMessage * wpas_dbus_handler_send_driver_command(DBusMessage *message,
-+	struct wpa_supplicant *wpa_s);
-+#endif
-+
- #endif /* CTRL_IFACE_DBUS_HANDLERS_NEW_H */
 Index: wpa/wpa_supplicant/dbus/Makefile
 ===================================================================
 --- wpa.orig/wpa_supplicant/dbus/Makefile
 +++ wpa/wpa_supplicant/dbus/Makefile
-@@ -67,6 +67,11 @@ LIB_OBJS += dbus_old_handlers_wps.o
+@@ -67,6 +67,10 @@ LIB_OBJS += dbus_old_handlers_wps.o
  LIB_OBJS += dbus_new_handlers_wps.o
  endif
  
 +ifdef CONFIG_ANDROID_HAL
 +CFLAGS += -DCONFIG_ANDROID_HAL
-+LIBS += -ldl
 +endif
 +
  libwpadbus.a: $(LIB_OBJS)
@@ -188,13 +148,12 @@ Index: wpa/wpa_supplicant/Makefile
 ===================================================================
 --- wpa.orig/wpa_supplicant/Makefile
 +++ wpa/wpa_supplicant/Makefile
-@@ -1586,6 +1586,11 @@ EXTRALIBS += WbemUuid.Lib
+@@ -1586,6 +1586,10 @@ EXTRALIBS += WbemUuid.Lib
  endif
  endif
  
 +ifdef CONFIG_ANDROID_HAL
 +CFLAGS += -DCONFIG_ANDROID_HAL
-+LIBS += -ldl
 +endif
 +
  ifndef LDO
