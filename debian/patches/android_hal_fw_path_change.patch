@@ -38,7 +38,7 @@ Index: wpa/wpa_supplicant/dbus/dbus_new_handlers.c
 ===================================================================
 --- wpa.orig/wpa_supplicant/dbus/dbus_new_handlers.c
 +++ wpa/wpa_supplicant/dbus/dbus_new_handlers.c
-@@ -632,6 +632,65 @@ oom:
+@@ -632,6 +632,64 @@ oom:
  	goto out;
  }
  
@@ -59,7 +59,6 @@ Index: wpa/wpa_supplicant/dbus/dbus_new_handlers.c
 +	DBusMessageIter iter_dict;
 +	DBusMessage *reply = NULL;
 +	DBusMessageIter iter;
-+	void *libwifi;
 +	const char *iface, *firmware, *path;
 +	int res = 0;
 +	FILE *f = NULL;
@@ -84,7 +83,7 @@ Index: wpa/wpa_supplicant/dbus/dbus_new_handlers.c
 +	if (!f) {
 +		reply = wpas_dbus_error_unknown_error(
 +			message, "wpa_supplicant couldn't open the "
-+			"firmware path. Please check the permissions";
++			"firmware path. Please check the permissions");
 +		goto out;
 +	}
 +
