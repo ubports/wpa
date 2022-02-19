@@ -19,7 +19,6 @@ CVE-2015-5315-2.patch
 CVE-2015-5316.patch
 CVE-2015-8041.patch
 wpasupplicant_band_selection_aa517ae2.patch
-allow-private-driver-commands.patch
 enable-widi-for-mtk.patch
 2016-1/0001-WPS-Reject-a-Credential-with-invalid-passphrase.patch
 2016-1/0002-Reject-psk-parameter-set-with-invalid-passphrase-cha.patch
